@@ -1,5 +1,5 @@
 group 'com.github.robhinds.slick-sql'
-version '1.0-SNAPSHOT'
+version '1.0.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -13,6 +13,6 @@ apply plugin: 'groovy'
 dependencies {
     compile gradleApi()
     compile localGroovy()
-    compile "de.gesellix:gradle-docker-plugin:2018-01-30T22-14-21"
+    compile "de.gesellix:gradle-docker-plugin:2017-11-08T12-39-47"
     testCompile "junit:junit:4.12"
 }
