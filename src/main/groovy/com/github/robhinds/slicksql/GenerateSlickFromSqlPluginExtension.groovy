@@ -1,7 +1,7 @@
 package com.github.robhinds.slicksql
 
 class GenerateSlickFromSqlPluginExtension {
-    String dockerImageName
+    String dockerImageName = "mysql:5.7.21"
     String dockerContainerName = "codegen-db"
     String localDockerHost = System.getenv("DOCKER_HOST") ?: "https://localhost:2376"
     String dbName
