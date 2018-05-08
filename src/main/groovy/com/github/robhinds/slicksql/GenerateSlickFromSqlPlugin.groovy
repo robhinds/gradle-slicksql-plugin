@@ -17,11 +17,11 @@ class GenerateSlickFromSqlPlugin implements Plugin<Project> {
         addCodeGenPhase(project)
         addDependencies(project)
         createSourceSet(project)
-        dockerDbStopTask(project)
-        dockerDbRmTask(project)
-        dockerDbStartTask(project)
-        dockerDbGetInfoTask(project)
-        waitForDockerDbTask(project)
+        stopDatabaseTask(project)
+        removeDatabaseContainerTask(project)
+        startDatabaseTask(project)
+        databaseConnectionDetailsTask(project)
+        waitForDatabaseAvailableTask(project)
         generateSlickSourcesTask(project)
         codegenCleanTask(project)
     }
@@ -48,8 +48,8 @@ class GenerateSlickFromSqlPlugin implements Plugin<Project> {
         }
     }
 
-    protected DockerRunTask dockerDbStartTask(Project project) {
-        project.tasks.create("dockerDbStart", DockerRunTask) {
+    protected DockerRunTask startDatabaseTask(Project project) {
+        project.tasks.create("startDatabase", DockerRunTask) {
             project.afterEvaluate {
                 imageName = project.extensions.generator.dockerImageName
                 containerName = project.extensions.generator.dockerContainerName
@@ -71,12 +71,12 @@ class GenerateSlickFromSqlPlugin implements Plugin<Project> {
                         ]
                 ]
             }
-            finalizedBy project.tasks.dockerDbRm
+            finalizedBy project.tasks.removeDatabaseContainer
         }
     }
 
-    protected DockerStopTask dockerDbStopTask(Project project) {
-        project.tasks.create("dockerDbStop", DockerStopTask) {
+    protected DockerStopTask stopDatabaseTask(Project project) {
+        project.tasks.create("stopDatabase", DockerStopTask) {
             project.afterEvaluate {
                 containerId = project.extensions.generator.dockerContainerName
                 dockerHost = project.extensions.generator.localDockerHost
@@ -84,23 +84,23 @@ class GenerateSlickFromSqlPlugin implements Plugin<Project> {
         }
     }
 
-    protected DockerRmTask dockerDbRmTask(Project project) {
-        project.tasks.create("dockerDbRm", DockerRmTask) {
+    protected DockerRmTask removeDatabaseContainerTask(Project project) {
+        project.tasks.create("removeDatabaseContainer", DockerRmTask) {
             project.afterEvaluate {
                 containerId = project.extensions.generator.dockerContainerName
                 dockerHost = project.extensions.generator.localDockerHost
             }
-            dependsOn project.tasks.dockerDbStop
+            dependsOn project.tasks.stopDatabase
         }
     }
 
-    protected DockerInspectContainerTask dockerDbGetInfoTask(Project p) {
-        p.tasks.create("dockerDbGetInfo", DockerInspectContainerTask) {
+    protected DockerInspectContainerTask databaseConnectionDetailsTask(Project p) {
+        p.tasks.create("databaseConnectionDetails", DockerInspectContainerTask) {
             p.afterEvaluate {
                 containerId = p.extensions.generator.dockerContainerName
                 dockerHost = project.extensions.generator.localDockerHost
             }
-            dependsOn p.tasks.dockerDbStart
+            dependsOn p.tasks.startDatabase
 
             doLast {
                 def port = containerInfo.content.NetworkSettings.Ports["3306/tcp"][0].HostPort
@@ -113,14 +113,14 @@ class GenerateSlickFromSqlPlugin implements Plugin<Project> {
         }
     }
 
-    protected Exec waitForDockerDbTask(Project project) {
-        project.tasks.create("waitForDockerDb", Exec) {
+    protected Exec waitForDatabaseAvailableTask(Project project) {
+        project.tasks.create("waitForDatabaseAvailable", Exec) {
             project.afterEvaluate {
                 doFirst {
                     commandLine 'bash', '-c', "while ! curl -s localhost:${project.extensions.generator.port}; do sleep 1; done > /dev/null"
                 }
             }
-            dependsOn project.tasks.dockerDbGetInfo
+            dependsOn project.tasks.databaseConnectionDetails
         }
     }
 
@@ -140,8 +140,8 @@ class GenerateSlickFromSqlPlugin implements Plugin<Project> {
                 }
                 classpath project.configurations.codegen
                 project.tasks.generateSlickSources.dependsOn "${project.extensions.generator.migrationProjectName}:flywayMigrate"
-                project.tasks.getByPath("${project.extensions.generator.migrationProjectName}:flywayMigrate").dependsOn project.tasks.waitForDockerDb
-                project.tasks.dockerDbRm.mustRunAfter project.tasks.generateSlickSources
+                project.tasks.getByPath("${project.extensions.generator.migrationProjectName}:flywayMigrate").dependsOn project.tasks.waitForDatabaseAvailable
+                project.tasks.removeDatabaseContainer.mustRunAfter project.tasks.generateSlickSources
                 project.tasks.compileScala.dependsOn project.tasks.generateSlickSources
             }
         }
