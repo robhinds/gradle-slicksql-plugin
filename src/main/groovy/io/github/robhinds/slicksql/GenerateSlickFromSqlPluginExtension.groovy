@@ -1,4 +1,4 @@
-package com.github.robhinds.slicksql
+package io.github.robhinds.slicksql
 
 class GenerateSlickFromSqlPluginExtension {
     String dockerImageName = "mysql:5.7.21"

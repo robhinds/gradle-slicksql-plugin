@@ -1,4 +1,4 @@
-package com.github.robhinds.slicksql
+package io.github.robhinds.slicksql
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -31,10 +31,10 @@ class GenerateSlickFromSqlPlugin implements Plugin<Project> {
     }
 
     protected addDependencies(Project project) {
-        project.dependencies.add("codegen", "org.scala-lang:scala-reflect:2.11.8")
-        project.dependencies.add("codegen", "com.typesafe.slick:slick_2.11:3.2.3")
-        project.dependencies.add("codegen", "com.typesafe.slick:slick-codegen_2.11:3.2.3")
-        project.dependencies.add("codegen", "com.typesafe.slick:slick-hikaricp_2.11:3.2.3")
+        project.dependencies.add("codegen", "org.scala-lang:scala-reflect:2.12.8")
+        project.dependencies.add("codegen", "com.typesafe.slick:slick_2.12:3.2.3")
+        project.dependencies.add("codegen", "com.typesafe.slick:slick-codegen_2.12:3.2.3")
+        project.dependencies.add("codegen", "com.typesafe.slick:slick-hikaricp_2.12:3.2.3")
         project.dependencies.add("codegen", "mysql:mysql-connector-java:6.0.6")
     }
 

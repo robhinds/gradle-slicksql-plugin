@@ -1,5 +1,5 @@
-group 'com.github.robhinds.slick-sql'
-version '1.0.0-SNAPSHOT'
+group 'io.github.robhinds.slick-sql'
+version '0.0.1'
 
 repositories {
     mavenCentral()

@@ -1,4 +1,4 @@
-package com.github.robhinds.slicksql
+package io.github.robhinds.slicksql
 
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
